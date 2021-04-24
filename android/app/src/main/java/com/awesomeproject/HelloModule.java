@@ -27,7 +27,11 @@ public class HelloModule extends ReactContextBaseJavaModule {
 
     @ReactMethod(isBlockingSynchronousMethod = true)
     public void Response(String r) {
-
         Hello.returnResponse(r);
+    }
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public String GetIp(){
+        return  Hello.getOutboundIP();
     }
 }

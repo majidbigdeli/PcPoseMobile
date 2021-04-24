@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -16,6 +16,7 @@ import {
   StatusBar,
   DeviceEventEmitter,
   NativeModules,
+  Button,
 } from 'react-native';
 
 import {
@@ -29,31 +30,47 @@ import {
 const Core = NativeModules.CoreM;
 
 const App: () => React$Node = () => {
+  const [pay, setPay] = useState({
+    Amount: '',
+    MerchantMsg: '',
+    Id: '',
+  });
   useEffect(() => {
     DeviceEventEmitter.addListener('customEventName', function (e) {
       var data = JSON.parse(e);
-      console.log(data);
-
-      var obj = {
-        Id: data.Id,
-        AccountNo: '555',
-        PAN: '12545',
-        PcID: '1234',
-        ReasonCode: '101',
-        ReqID: '145',
-        ReturnCode: '101',
-        SerialTransaction: '452111',
-        TerminalNo: '452',
-        TraceNumber: '458',
-        TransactionDate: '2020-02-01',
-        TransactionTime: '20:00',
+      setPay({
         Amount: data.Amount,
-      };
-      Core.Response(JSON.stringify(obj));
-
+        MerchantMsg: data.MerchantMsg,
+        Id: data.Id,
+      });
       // handle event and you will get a value in event object, you can log it here
     });
   }, []);
+
+  const _pay = () => {
+    var obj = {
+      Id: pay.Id,
+      AccountNo: '555',
+      PAN: '12545',
+      PcID: '4758',
+      ReasonCode: '101',
+      ReqID: '1111',
+      ReturnCode: '101',
+      SerialTransaction: '452111',
+      TerminalNo: '4444',
+      TraceNumber: '777',
+      TransactionDate: '2020-02-01',
+      TransactionTime: '20:00',
+      Amount: pay.Amount,
+    };
+    Core.Response(JSON.stringify(obj));
+    setPay({
+      Amount: '',
+      Id: '',
+      MerchantMsg: '',
+    });
+  };
+
   return (
     <>
       <StatusBar barStyle="dark-content" />
@@ -61,39 +78,26 @@ const App: () => React$Node = () => {
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
           style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: vv</Text>
-            </View>
-          )}
           <View style={styles.body}>
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>CCCCC eeee</Text>
               <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
+                Mobile IP: <Text style={styles.highlight}>{Core.GetIp()}</Text>
               </Text>
             </View>
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
               <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
+                Amount: <Text style={styles.highlight}>{pay.Amount}</Text>
               </Text>
             </View>
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
               <Text style={styles.sectionDescription}>
-                <DebugInstructions />
+                MerchantMsg:{' '}
+                <Text style={styles.highlight}>{pay.MerchantMsg}</Text>
               </Text>
             </View>
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
+              <Button title="پرداخت" onPress={_pay} />
             </View>
-            <LearnMoreLinks />
           </View>
         </ScrollView>
       </SafeAreaView>
